@@ -1,0 +1,27 @@
+body {
+    background-color: #f8f9fa;
+}
+
+h1 {
+    color: #6f42c1;
+    font-weight: bold;
+}
+
+.card {
+    border: none;
+    transition: 0.3s;
+    border-radius: 15px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-title {
+    color: #6f42c1;
+}
+
+
+h2{
+    color: #6f42c1;
+}
