@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equipes</title>
-</head>
-<body>
-    <?php require_once '../includes/header.php'; ?>
+<?php require_once '../includes/header.php'; ?>
 
 <h2 class="mb-4">Equipes Cadastradas</h2>
 
@@ -62,5 +54,3 @@
 </table>
 
 <?php require_once '../includes/footer.php'; ?>
-</body>
-</html>

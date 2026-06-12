@@ -8,7 +8,7 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/MATCHPOINT/assets/style.css">
 
 
 </head>
@@ -18,7 +18,7 @@
     <div class="container">
 
 
-    <a class="navbar-brand fw-bold" href="/index.php">
+    <a class="navbar-brand fw-bold" href="/MATCHPOINT/index.php">
         🏐 Liga de Vôlei Feminina
     </a>
 
@@ -62,8 +62,7 @@
     </div>
 
 </div>
-```
 
 </nav>
 
-<div class="container mt-4">
+<main class="container mt-4">

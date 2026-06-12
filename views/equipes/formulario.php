@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equipes</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/style.css">
-    <?php require_once '../includes/header.php'; ?>
-</head>
-<body>
+<?php require_once '../includes/header.php'; ?>
 
     <div class="container vh-100 d-flex justify-content-center align-items-center">
 
@@ -54,6 +44,5 @@
 
     </div>
 
-</body>
 <?php require_once '../includes/footer.php'; ?>
-</html>
+
