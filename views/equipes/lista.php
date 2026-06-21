@@ -1,56 +1,65 @@
 <?php require_once '../includes/header.php'; ?>
 
-<h2 class="mb-4">Equipes Cadastradas</h2>
+<div class="container mt-4">
 
-<a href="formulario.php" class="btn btn-success mb-3">
-    Nova Equipe
-</a>
+    <h2 class="mb-4">Equipes Cadastradas</h2>
 
-<table class="table table-striped table-hover">
+    <a href="formulario.php" class="btn btn-success mb-4">
+        Nova Equipe
+    </a>
 
-    <thead class="table-primary">
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Estado</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
+    <div class="row">
 
-    <tbody>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100">
 
-        <tr>
-            <td>1</td>
-            <td>IFRS Vôlei</td>
-            <td>RS</td>
-            <td>
-                <a href="#" class="btn btn-warning btn-sm">
-                    Editar
-                </a>
+                <div class="card-body">
 
-                <a href="#" class="btn btn-danger btn-sm">
-                    Excluir
-                </a>
-            </td>
-        </tr>
+                    <h5 class="card-title">IFRS Vôlei</h5>
 
-        <tr>
-            <td>2</td>
-            <td>Asavolei</td>
-            <td>RS</td>
-            <td>
-                <a href="#" class="btn btn-warning btn-sm">
-                    Editar
-                </a>
+                    <p class="card-text">
+                        <strong>Estado:</strong> RS
+                    </p>
 
-                <a href="#" class="btn btn-danger btn-sm">
-                    Excluir
-                </a>
-            </td>
-        </tr>
+                    <a href="#" class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
 
-    </tbody>
+                    <a href="#" class="btn btn-danger btn-sm">
+                        Excluir
+                    </a>
 
-</table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">Asavolei</h5>
+
+                    <p class="card-text">
+                        <strong>Estado:</strong> RS
+                    </p>
+
+                    <a href="#" class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
+
+                    <a href="#" class="btn btn-danger btn-sm">
+                        Excluir
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
 
 <?php require_once '../includes/footer.php'; ?>

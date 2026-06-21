@@ -34,25 +34,25 @@
         <ul class="navbar-nav ms-auto">
 
             <li class="nav-item">
-                <a class="nav-link" href="/views/equipes/formulario.php">
+                <a class="nav-link" href="/MATCHPOINT/views/equipes/lista.php">
                     Times
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="/MATCHPOINT/views/jogadores/lista.php">
                     Jogadoras
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="/MATCHPOINT/views/partidas/lista.php">
                     Jogos
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="/MATCHPOINT/views/ranking/lista.php">
                     Classificação
                 </a>
             </li>

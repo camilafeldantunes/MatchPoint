@@ -37,6 +37,9 @@
                     class="btn btn-primary w-100">
                     Cadastrar
                 </button>
+                <a href="lista.php" class="btn btn-secondary w-100 mt-2">
+                    Voltar
+                </a>
 
             </form>
 

@@ -32,7 +32,7 @@
                     <p class="card-text">
                         Gerenciar atletas.
                     </p>
-                    <a href="#" class="btn btn-success">
+                    <a href="views\jogadores\lista.php" class="btn btn-success">
                         Acessar
                     </a>
                 </div>
@@ -46,7 +46,7 @@
                     <p class="card-text">
                         Registrar partidas.
                     </p>
-                    <a href="#" class="btn btn-warning">
+                    <a href="views\partidas\lista.php" class="btn btn-warning">
                         Acessar
                     </a>
                 </div>
@@ -60,7 +60,7 @@
                     <p class="card-text">
                         Visualizar ranking.
                     </p>
-                    <a href="#" class="btn btn-danger">
+                    <a href="views\ranking\lista.php" class="btn btn-danger">
                         Acessar
                     </a>
                 </div>
