@@ -1,8 +1,33 @@
+<?php
+require_once '../../controllers/EquipeController.php';
+
+$controller = new EquipeController();
+
+/* DELETE AQUI */
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
+    $controller->excluir($id);
+
+    header("Location: lista.php");
+    exit;
+}
+
+$equipes = $controller->listar();
+   
+?>
+
+
+
 <?php require_once '../includes/header.php'; ?>
 
 <div class="container mt-4">
 
     <h2 class="mb-4">Equipes Cadastradas</h2>
+        
+        <a href="/MATCHPOINT/index.php" class="btn btn-secondary mb-4"> 
+            Voltar
+        </a>
+    
 
     <a href="formulario.php" class="btn btn-success mb-4">
         Nova Equipe
@@ -10,53 +35,51 @@
 
     <div class="row">
 
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100">
+        <?php foreach ($equipes as $equipe): ?>
 
-                <div class="card-body">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow h-100">
 
-                    <h5 class="card-title">IFRS Vôlei</h5>
+                    <div class="card-body">
+                        <?php if (!empty($equipe['foto'])): ?>
 
-                    <p class="card-text">
-                        <strong>Estado:</strong> RS
-                    </p>
+                            <img src="<?= $equipe['foto'] ?>"
+                                class="img-fluid mb-3"
+                                style="height: 150px; object-fit: cover; border-radius: 8px;">
 
-                    <a href="#" class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
+                        <?php endif; ?>
 
-                    <a href="#" class="btn btn-danger btn-sm">
-                        Excluir
-                    </a>
+                        <h5 class="card-title">
+                            <?= $equipe['nome'] ?>
+                        </h5>
 
-                </div>
+                        <p class="card-text">
+                            <strong>País:</strong> <?= $equipe['pais'] ?>
+                        </p>
 
-            </div>
-        </div>
+                        <div class="d-flex gap-2">
 
-        <div class="col-md-4 mb-4">
-            <div class="card shadow h-100">
+                            <!-- EDITAR (leva o ID para o formulário) -->
+                            <a href="formulario.php?id=<?= $equipe['id_equipe'] ?>"
+                               class="btn btn-warning btn-sm w-50">
+                                Editar
+                            </a>
 
-                <div class="card-body">
+                            <!-- EXCLUIR (depois você liga no controller) -->
+                            <a href="lista.php?delete=<?= $equipe['id_equipe'] ?>"
+                                class="btn btn-danger btn-sm w-50"
+                                onclick="return confirm('Tem certeza?')">
+                                    Excluir
+                            </a>
 
-                    <h5 class="card-title">Asavolei</h5>
+                        </div>
 
-                    <p class="card-text">
-                        <strong>Estado:</strong> RS
-                    </p>
-
-                    <a href="#" class="btn btn-warning btn-sm">
-                        Editar
-                    </a>
-
-                    <a href="#" class="btn btn-danger btn-sm">
-                        Excluir
-                    </a>
+                    </div>
 
                 </div>
-
             </div>
-        </div>
+
+        <?php endforeach; ?>
 
     </div>
 

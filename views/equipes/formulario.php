@@ -1,51 +1,110 @@
-<?php require_once '../includes/header.php'; ?>
+<?php
+require_once '../../controllers/EquipeController.php';
 
-    <div class="container vh-100 d-flex justify-content-center align-items-center">
+$controller = new EquipeController();
 
-        <div class="card shadow p-4" style="width: 500px;">
+$id = $_GET['id'] ?? null;
+$equipe = null;
 
-            <h2 class="text-center mb-4">
-                🏐 Cadastro de Equipes
-            </h2>
+if ($id) {
+    $equipe = $controller->buscarPorId($id);
+}
 
-            <form>
+require_once '../includes/header.php';
+?>
 
-                <div class="mb-3">
-                    <label for="InputEquipe" class="form-label">
-                        Nome da Equipe
-                    </label>
+<?php
 
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="InputEquipe">
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $id = $_POST['id'] ?? null;
+    $nome = $_POST['nome'];
+    $pais = $_POST['pais'];
+
+    // =========================
+    // UPLOAD DA FOTO
+    // =========================
+    $fotoPath = $equipe['foto'] ?? null;
+
+    if (!empty($_FILES['foto']['name'])) {
+
+        $nomeArquivo = time() . '_' . $_FILES['foto']['name'];
+        $tmp = $_FILES['foto']['tmp_name'];
+
+        $pasta = "../../fotos/";
+        if (!is_dir($pasta)) {
+            mkdir($pasta, 0777, true);
+        }
+
+        $caminhoFisico = $pasta . $nomeArquivo;
+
+        move_uploaded_file($tmp, $caminhoFisico);
+
+        $fotoPath = "/MATCHPOINT/fotos/" . $nomeArquivo;
+    }
+
+    // =========================
+    // INSERT OU UPDATE
+    // =========================
+    if ($id) {
+        $controller->atualizar($id, $nome, $pais, $fotoPath);
+    } else {
+        $controller->inserir($nome, $pais, $fotoPath);
+    }
+
+    header("Location: lista.php");
+    exit;
+}
+?>
+
+<div class="container mt-4 d-flex justify-content-center">
+
+    <div class="card p-4 shadow" style="width: 500px;">
+
+        <h3 class="text-center mb-4">
+            <?= $id ? 'Editar Equipe' : 'Nova Equipe' ?>
+        </h3>
+
+        <!-- IMPORTANTE PARA UPLOAD -->
+        <form method="POST" enctype="multipart/form-data">
+
+            <input type="hidden" name="id" value="<?= $equipe['id_equipe'] ?? '' ?>">
+
+            <div class="mb-3">
+                <label>Nome</label>
+                <input type="text" name="nome" class="form-control"
+                       value="<?= $equipe['nome'] ?? '' ?>" required>
+            </div>
+
+            <div class="mb-3">
+                <label>País</label>
+                <input type="text" name="pais" class="form-control"
+                       value="<?= $equipe['pais'] ?? '' ?>" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Foto</label>
+                <input type="file" name="foto" class="form-control">
+            </div>
+
+            <?php if (!empty($equipe['foto'])): ?>
+                <div class="mb-3 text-center">
+                    <img src="<?= $equipe['foto'] ?>" width="120" style="border-radius: 8px;">
                 </div>
+            <?php endif; ?>
 
-                <div class="mb-3">
-                    <label for="inputEstado" class="form-label">
-                        Estado
-                    </label>
+            <button type="submit" class="btn btn-primary w-100">
+                Salvar
+            </button>
 
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="inputEstado">
-                </div>
+            <a href="lista.php" class="btn btn-secondary w-100 mt-2">
+                Voltar
+            </a>
 
-                <button
-                    type="submit"
-                    class="btn btn-primary w-100">
-                    Cadastrar
-                </button>
-                <a href="lista.php" class="btn btn-secondary w-100 mt-2">
-                    Voltar
-                </a>
-
-            </form>
-
-        </div>
+        </form>
 
     </div>
 
-<?php require_once '../includes/footer.php'; ?>
+</div>
 
+<?php require_once '../includes/footer.php'; ?>
