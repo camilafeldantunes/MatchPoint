@@ -1,71 +1,51 @@
 <?php
-require_once '../../controllers/EquipeController.php';
+require_once __DIR__ . '/../../controllers/EquipeController.php';
 
 $controller = new EquipeController();
 
-$id = $_GET['id'] ?? null;
+$id     = $_GET['id'] ?? null;
 $equipe = null;
 
 if ($id) {
     $equipe = $controller->buscarPorId($id);
 }
 
-require_once '../includes/header.php';
-?>
-
-<?php
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id     = $_POST['id']     ?? null;
+    $nome   = $_POST['nome'];
+    $estado = $_POST['estado'];
+    $cidade = $_POST['cidade'];
 
-    $id = $_POST['id'] ?? null;
-    $nome = $_POST['nome'];
-    $pais = $_POST['pais'];
-
-    // =========================
-    // UPLOAD DA FOTO
-    // =========================
     $fotoPath = $equipe['foto'] ?? null;
 
     if (!empty($_FILES['foto']['name'])) {
-
         $nomeArquivo = time() . '_' . $_FILES['foto']['name'];
-        $tmp = $_FILES['foto']['tmp_name'];
-
-        $pasta = "../../fotos/";
-        if (!is_dir($pasta)) {
-            mkdir($pasta, 0777, true);
-        }
-
-        $caminhoFisico = $pasta . $nomeArquivo;
-
-        move_uploaded_file($tmp, $caminhoFisico);
-
+        $pasta = __DIR__ . '/../../fotos/';
+        if (!is_dir($pasta)) mkdir($pasta, 0777, true);
+        move_uploaded_file($_FILES['foto']['tmp_name'], $pasta . $nomeArquivo);
         $fotoPath = "/MATCHPOINT/fotos/" . $nomeArquivo;
     }
 
-    // =========================
-    // INSERT OU UPDATE
-    // =========================
     if ($id) {
-        $controller->atualizar($id, $nome, $pais, $fotoPath);
+        $controller->atualizar($id, $nome, $estado, $cidade, $fotoPath);
     } else {
-        $controller->inserir($nome, $pais, $fotoPath);
+        $controller->inserir($nome, $estado, $cidade, $fotoPath);
     }
 
     header("Location: lista.php");
     exit;
 }
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="container mt-4 d-flex justify-content-center">
-
     <div class="card p-4 shadow" style="width: 500px;">
 
         <h3 class="text-center mb-4">
             <?= $id ? 'Editar Equipe' : 'Nova Equipe' ?>
         </h3>
 
-        <!-- IMPORTANTE PARA UPLOAD -->
         <form method="POST" enctype="multipart/form-data">
 
             <input type="hidden" name="id" value="<?= $equipe['id_equipe'] ?? '' ?>">
@@ -76,10 +56,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        value="<?= $equipe['nome'] ?? '' ?>" required>
             </div>
 
-            <div class="mb-3">
-                <label>País</label>
-                <input type="text" name="pais" class="form-control"
-                       value="<?= $equipe['pais'] ?? '' ?>" required>
+            <div class="row g-3 mb-3">
+
+                <div class="col-6">
+                    <label>Estado (UF)</label>
+                    <select name="estado" id="estado" class="form-select" required
+                            onchange="carregarCidades()">
+                        <option value="">Selecione</option>
+                        <?php
+                        $ufs = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA',
+                                'MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN',
+                                'RO','RR','RS','SC','SE','SP','TO'];
+                        foreach ($ufs as $uf):
+                            $sel = ($equipe['estado'] ?? '') === $uf ? 'selected' : '';
+                        ?>
+                            <option value="<?= $uf ?>" <?= $sel ?>><?= $uf ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="col-6">
+                    <label>
+                        Cidade
+                        <span id="spin" style="font-size:12px; color:#888; display:none;">
+                            carregando…
+                        </span>
+                    </label>
+                    <select name="cidade" id="cidade" class="form-select" required>
+                        <?php if (!empty($equipe['cidade'])): ?>
+                            <option value="<?= $equipe['cidade'] ?>" selected>
+                                <?= $equipe['cidade'] ?>
+                            </option>
+                        <?php else: ?>
+                            <option value="">Selecione o estado primeiro</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
             </div>
 
             <div class="mb-3">
@@ -93,18 +106,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-            <button type="submit" class="btn btn-primary w-100">
-                Salvar
-            </button>
-
-            <a href="lista.php" class="btn btn-secondary w-100 mt-2">
-                Voltar
-            </a>
+            <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            <a href="lista.php" class="btn btn-secondary w-100 mt-2">Voltar</a>
 
         </form>
-
     </div>
-
 </div>
 
-<?php require_once '../includes/footer.php'; ?>
+<script>
+async function carregarCidades() {
+    const uf   = document.getElementById('estado').value;
+    const sel  = document.getElementById('cidade');
+    const spin = document.getElementById('spin');
+
+    if (!uf) {
+        sel.innerHTML = '<option value="">Selecione o estado primeiro</option>';
+        return;
+    }
+
+    spin.style.display = 'inline';
+    sel.disabled = true;
+    sel.innerHTML = '<option>Carregando cidades…</option>';
+
+    try {
+        const res = await fetch(
+            `https://brasilapi.com.br/api/ibge/municipios/v1/${uf}?providers=dados-abertos-br,gov,wikipedia`
+        );
+        const cidades = await res.json();
+
+        sel.innerHTML = '<option value="">Selecione a cidade</option>' +
+            cidades.map(c =>
+                `<option value="${c.nome}">${c.nome}</option>`
+            ).join('');
+
+        sel.disabled = false;
+    } catch (e) {
+        sel.innerHTML = '<option value="">Erro ao carregar cidades</option>';
+    }
+
+    spin.style.display = 'none';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const estadoAtual  = "<?= $equipe['estado'] ?? '' ?>";
+    const cidadeAtual  = "<?= $equipe['cidade'] ?? '' ?>";
+
+    if (estadoAtual) {
+        carregarCidades().then(() => {
+            const sel = document.getElementById('cidade');
+            for (let opt of sel.options) {
+                if (opt.value === cidadeAtual) {
+                    opt.selected = true;
+                    break;
+                }
+            }
+        });
+    }
+});
+</script>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

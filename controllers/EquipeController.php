@@ -1,6 +1,6 @@
 <?php
 
-require_once '../../config/conexao.php';
+require_once __DIR__ . '/../config/conexao.php';
 
 class EquipeController
 {
@@ -16,40 +16,33 @@ class EquipeController
     }
 
 
-    public function inserir($nome, $pais, $foto = null)
-    {
-        global $pdo;
+    public function inserir($nome, $estado, $cidade, $foto = null)
+{
+    global $pdo;
+    $sql = "INSERT INTO equipe (nome, estado, cidade, foto)
+            VALUES (:nome, :estado, :cidade, :foto)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':nome', $nome);
+    $stmt->bindParam(':estado', $estado);
+    $stmt->bindParam(':cidade', $cidade);
+    $stmt->bindParam(':foto', $foto);
+    return $stmt->execute();
+}
 
-        $sql = "INSERT INTO equipe (nome, pais, foto)
-                VALUES (:nome, :pais, :foto)";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':nome', $nome);
-        $stmt->bindParam(':pais', $pais);
-        $stmt->bindParam(':foto', $foto);
-
-        return $stmt->execute();
-    }
-
-    public function atualizar($id, $nome, $pais, $foto = null)
-    {
-        global $pdo;
-
-        $sql = "UPDATE equipe
-                SET nome = :nome,
-                    pais = :pais,
-                    foto = :foto
-                WHERE id_equipe = :id";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':nome', $nome);
-        $stmt->bindParam(':pais', $pais);
-        $stmt->bindParam(':foto', $foto);
-
-        return $stmt->execute();
-    }
-
+public function atualizar($id, $nome, $estado, $cidade, $foto = null)
+{
+    global $pdo;
+    $sql = "UPDATE equipe
+            SET nome = :nome, estado = :estado, cidade = :cidade, foto = :foto
+            WHERE id_equipe = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $id);
+    $stmt->bindParam(':nome', $nome);
+    $stmt->bindParam(':estado', $estado);
+    $stmt->bindParam(':cidade', $cidade);
+    $stmt->bindParam(':foto', $foto);
+    return $stmt->execute();
+}
     public function excluir($id)
     {
         global $pdo;

@@ -1,5 +1,5 @@
 <?php
-require_once '../../controllers/EquipeController.php';
+require_once __DIR__ . '/../../controllers/EquipeController.php'; 
 
 $controller = new EquipeController();
 
@@ -52,9 +52,11 @@ $equipes = $controller->listar();
                         <h5 class="card-title">
                             <?= $equipe['nome'] ?>
                         </h5>
-
                         <p class="card-text">
-                            <strong>País:</strong> <?= $equipe['pais'] ?>
+                            <strong>Estado:</strong> <?= $equipe['estado'] ?? '—' ?>
+                        </p>
+                        <p class="card-text">
+                            <strong>Cidade:</strong> <?= $equipe['cidade'] ?? '—' ?>
                         </p>
 
                         <div class="d-flex gap-2">

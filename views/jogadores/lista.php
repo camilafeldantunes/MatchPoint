@@ -1,4 +1,17 @@
-<?php require_once '../includes/header.php'; ?>
+<?php require_once __DIR__ . '/../../controllers/JogadorController.php';
+
+$controller = new JogadorController();
+
+if (isset($_GET['delete'])) {
+    $controller->excluir($_GET['delete']);
+    header("Location: lista.php");
+    exit;
+}
+
+$jogadores = $controller->listar();
+
+require_once __DIR__ . '/../includes/header.php';
+?>
 
 <h2 class="mb-4">Jogadoras Cadastradas</h2>
 
@@ -8,67 +21,38 @@
 
 <div class="row">
 
-    <div class="col-md-4 mb-4">
-        <div class="card shadow h-100">
+     <?php foreach ($jogadores as $jogador): ?>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow h-100">
 
-            <img src="/MATCHPOINT/fotos/helena.jpg"
-                class="card-img-top"
-                alt="Helena"
-                style="width: 150px; height: 150px; object-fit: cover;">
+                    <?php if (!empty($jogador['foto'])): ?>
+                        <img src="<?= $jogador['foto'] ?>"
+                             class="card-img-top"
+                             style="height: 180px; object-fit: cover;">
+                    <?php endif; ?>
 
-            <div class="card-body">
+                    <div class="card-body">
+                        <h5 class="card-title"><?= $jogador['nome'] ?></h5>
+                        <p class="card-text">
+                            <strong>Posição:</strong> <?= $jogador['posicao'] ?><br>
+                            <strong>Número:</strong> <?= $jogador['numero'] ?><br>
+                            <strong>Equipe:</strong> <?= $jogador['nome_equipe'] ?? '—' ?>
+                        </p>
+                    </div>
 
-                <h5 class="card-title">Helena</h5>
+                    <div class="card-footer bg-white border-0 d-flex gap-2">
+                        <a href="formulario.php?id=<?= $jogador['id_jogador'] ?>"
+                           class="btn btn-warning btn-sm w-50">Editar</a>
+                        <a href="lista.php?delete=<?= $jogador['id_jogador'] ?>"
+                           class="btn btn-danger btn-sm w-50"
+                           onclick="return confirm('Tem certeza?')">Excluir</a>
+                    </div>
 
-                <p class="card-text">
-                    <strong>Posição:</strong> Levantadora<br>
-                    <strong>Número:</strong> 10<br>
-                    <strong>Equipe:</strong> IFRS Vôlei
-                </p>
-
+                </div>
             </div>
-
-            <div class="card-footer bg-white border-0">
-                <a href="#" class="btn btn-warning btn-sm">
-                    Editar
-                </a>
-
-                <a href="#" class="btn btn-danger btn-sm">
-                    Excluir
-                </a>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="col-md-4 mb-4">
-        <div class="card shadow">
-
-            <div class="card-body">
-
-                <h5 class="card-title">
-                    Maria Souza
-                </h5>
-
-                <p class="card-text">
-                    <strong>Posição:</strong> Ponteira<br>
-                    <strong>Número:</strong> 7<br>
-                    <strong>Equipe:</strong> Asavolei
-                </p>
-
-                <a href="#" class="btn btn-warning btn-sm">
-                    Editar
-                </a>
-
-                <a href="#" class="btn btn-danger btn-sm">
-                    Excluir
-                </a>
-
-            </div>
-
-        </div>
+        <?php endforeach; ?>
     </div>
 
 </div>
 
-<?php require_once '../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
