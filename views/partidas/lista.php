@@ -1,10 +1,27 @@
-<?php require_once '../includes/header.php'; ?>
+<?php
+require_once '../../controllers/PartidaController.php';
+
+$controller = new PartidaController();
+
+if (isset($_GET['delete'])) {
+    $controller->excluir($_GET['delete']);
+    header("Location: lista.php");
+    exit;
+}
+
+$partidas = $controller->listar();
+
+require_once '../includes/header.php';
+?>
 
 <div class="container mt-4">
 
 <h2 class="mb-4">Jogos Cadastrados</h2>
+<a href="/MATCHPOINT/index.php" class="btn btn-secondary mb-4"> 
+    Voltar
+</a>
 
-<a href="formulario.php" class="btn btn-success mb-3">
+<a href="formulario.php" class="btn btn-success mb-4">
     Novo Jogo
 </a>
 
@@ -25,64 +42,46 @@
 
     <tbody>
 
+        <?php foreach ($partidas as $partida): ?>
+
         <tr>
-            <td>1</td>
-            <td>25/06/2026</td>
-            <td>19:00</td>
-            <td>IFRS Vôlei</td>
-            <td>Asavolei</td>
-            <td>Ginásio IFRS</td>
-            <td>3 x 1</td>
+            <td><?= $partida['id_jogo'] ?></td>
+
             <td>
-                <a href="#" class="btn btn-warning btn-sm">
+                <?= date('d/m/Y', strtotime($partida['data_jogo'])) ?>
+            </td>
+
+            <td>
+                <?= substr($partida['horario'], 0, 5) ?>
+            </td>
+
+            <td><?= htmlspecialchars($partida['mandante']) ?></td>
+
+            <td><?= htmlspecialchars($partida['visitante']) ?></td>
+
+            <td><?= htmlspecialchars($partida['local_jogo']) ?></td>
+
+            <td>
+                <?= $partida['resultado'] ?: '-' ?>
+            </td>
+
+            <td>
+                <a href="formulario.php?id=<?= $partida['id_jogo'] ?>"
+                class="btn btn-warning btn-sm">
                     Editar
                 </a>
 
-                <a href="#" class="btn btn-danger btn-sm">
+                <a href="?delete=<?= $partida['id_jogo'] ?>"
+                class="btn btn-danger btn-sm"
+                onclick="return confirm('Deseja excluir esta partida?')">
                     Excluir
                 </a>
             </td>
         </tr>
 
-        <tr>
-            <td>2</td>
-            <td>28/06/2026</td>
-            <td>20:00</td>
-            <td>UPF Vôlei</td>
-            <td>IFRS Vôlei</td>
-            <td>Ginásio Municipal</td>
-            <td>2 x 3</td>
-            <td>
-                <a href="#" class="btn btn-warning btn-sm">
-                    Editar
-                </a>
+        <?php endforeach; ?>
 
-                <a href="#" class="btn btn-danger btn-sm">
-                    Excluir
-                </a>
-            </td>
-        </tr>
-
-        <tr>
-            <td>3</td>
-            <td>05/07/2026</td>
-            <td>18:30</td>
-            <td>Asavolei</td>
-            <td>UPF Vôlei</td>
-            <td>Ginásio Asavolei</td>
-            <td>-</td>
-            <td>
-                <a href="#" class="btn btn-warning btn-sm">
-                    Editar
-                </a>
-
-                <a href="#" class="btn btn-danger btn-sm">
-                    Excluir
-                </a>
-            </td>
-        </tr>
-
-    </tbody>
+        </tbody>
 
 </table>
 

@@ -14,6 +14,9 @@ require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <h2 class="mb-4">Jogadoras Cadastradas</h2>
+<a href="/MATCHPOINT/index.php" class="btn btn-secondary mb-4"> 
+    Voltar
+</a>
 
 <a href="formulario.php" class="btn btn-success mb-4">
     Nova Jogadora
