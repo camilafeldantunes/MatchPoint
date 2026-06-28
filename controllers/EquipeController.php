@@ -1,69 +1,37 @@
 <?php
 
-require_once __DIR__ . '/../config/conexao.php';
+require_once __DIR__. '/../models/Equipes.php';
 
 class EquipeController
 {
-    public function listar()
+    private $model;
+
+    public function __construct()
     {
-        global $pdo;
-
-        $sql = "SELECT * FROM equipe";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->model = new Equipe();
     }
 
-
-    public function inserir($nome, $estado, $cidade, $foto = null)
-{
-    global $pdo;
-    $sql = "INSERT INTO equipe (nome, estado, cidade, foto)
-            VALUES (:nome, :estado, :cidade, :foto)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':nome', $nome);
-    $stmt->bindParam(':estado', $estado);
-    $stmt->bindParam(':cidade', $cidade);
-    $stmt->bindParam(':foto', $foto);
-    return $stmt->execute();
-}
-
-public function atualizar($id, $nome, $estado, $cidade, $foto = null)
-{
-    global $pdo;
-    $sql = "UPDATE equipe
-            SET nome = :nome, estado = :estado, cidade = :cidade, foto = :foto
-            WHERE id_equipe = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':id', $id);
-    $stmt->bindParam(':nome', $nome);
-    $stmt->bindParam(':estado', $estado);
-    $stmt->bindParam(':cidade', $cidade);
-    $stmt->bindParam(':foto', $foto);
-    return $stmt->execute();
-}
-    public function excluir($id)
+    public function listar()
     {
-        global $pdo;
-
-        $sql = "DELETE FROM equipe WHERE id_equipe = :id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':id', $id);
-
-        return $stmt->execute();
+        return $this->model->listar();
     }
 
     public function buscarPorId($id)
     {
-        global $pdo;
+        return $this->model->buscarPorId($id);
+    }
 
-        $sql = "SELECT * FROM equipe WHERE id_equipe = :id";
+    public function inserir($nome,$estado,$cidade,$foto)
+    {
+        return $this->model->inserir($nome,$estado,$cidade,$foto);
+    }
+    public function atualizar($id, $nome, $estado, $cidade, $foto = null)
+    {
+        return $this->model->atualizar($id, $nome, $estado, $cidade, $foto);
+    }
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function excluir($id)
+    {
+        return $this->model->excluir($id);
     }
 }
