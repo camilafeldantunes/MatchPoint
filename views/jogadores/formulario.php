@@ -14,33 +14,32 @@ if ($id) {
 
 $equipes = $equipeController->listar();
 
+require_once __DIR__ . '/../../config/upload.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id        = $_POST['id'] ?? null;
+    $id        = $_POST['id']        ?? null;
     $nome      = $_POST['nome'];
     $posicao   = $_POST['posicao'];
     $numero    = $_POST['numero'];
     $id_equipe = $_POST['id_equipe'];
 
-    $fotoPath = $jogador['foto'] ?? null;
+    $pasta     = __DIR__ . '/../../fotos/';
+    $resultado = processarUploadImagem($_FILES['foto'], $pasta, $jogador['foto'] ?? null);
 
-    if (!empty($_FILES['foto']['name'])) {
-        $nomeArquivo  = time() . '_' . $_FILES['foto']['name'];
-        $pasta        = __DIR__ . '/../../fotos/';
-        if (!is_dir($pasta)) {
-            mkdir($pasta, 0777, true);
-        }
-        move_uploaded_file($_FILES['foto']['tmp_name'], $pasta . $nomeArquivo);
-        $fotoPath = "/MATCHPOINT/fotos/" . $nomeArquivo;
-    }
-
-    if ($id) {
-        $jogadorController->atualizar($id, $nome, $posicao, $numero, $id_equipe, $fotoPath);
+    if (!$resultado['sucesso']) {
+        $erroUpload = $resultado['erro'];
     } else {
-        $jogadorController->inserir($nome, $posicao, $numero, $id_equipe, $fotoPath);
-    }
+        $fotoPath = $resultado['caminho'];
 
-    header("Location: lista.php");
-    exit;
+        if ($id) {
+            $jogadorController->atualizar($id, $nome, $posicao, $numero, $id_equipe, $fotoPath);
+        } else {
+            $jogadorController->inserir($nome, $posicao, $numero, $id_equipe, $fotoPath);
+        }
+
+        header("Location: lista.php");
+        exit;
+    }
 }
 
 require_once __DIR__ . '/../includes/header.php';
@@ -101,7 +100,9 @@ require_once __DIR__ . '/../includes/header.php';
 
             <button type="submit" class="btn btn-primary w-100">Salvar</button>
             <a href="lista.php" class="btn btn-secondary w-100 mt-2">Voltar</a>
-
+            <?php if (!empty($erroUpload)): ?>
+                <div class="alert alert-danger"><?= $erroUpload ?></div>
+            <?php endif; ?>
         </form>
     </div>
 </div>

@@ -8,7 +8,7 @@ class JogadorController
     {
         global $pdo;
         $sql = "SELECT j.*, e.nome AS nome_equipe 
-                FROM jogador j
+                FROM jogadora j
                 LEFT JOIN equipe e ON j.id_equipe = e.id_equipe";
         $stmt = $pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -17,7 +17,7 @@ class JogadorController
     public function inserir($nome, $posicao, $numero, $id_equipe, $foto = null)
     {
         global $pdo;
-        $sql = "INSERT INTO jogador (nome, posicao, numero, id_equipe, foto)
+        $sql = "INSERT INTO jogadora (nome, posicao, numero, id_equipe, foto)
                 VALUES (:nome, :posicao, :numero, :id_equipe, :foto)";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':nome', $nome);
@@ -31,7 +31,7 @@ class JogadorController
     public function atualizar($id, $nome, $posicao, $numero, $id_equipe, $foto = null)
     {
         global $pdo;
-        $sql = "UPDATE jogador 
+        $sql = "UPDATE jogadora 
                 SET nome = :nome, posicao = :posicao, numero = :numero,
                     id_equipe = :id_equipe, foto = :foto
                 WHERE id_jogador = :id";
@@ -48,7 +48,7 @@ class JogadorController
     public function excluir($id)
     {
         global $pdo;
-        $sql = "DELETE FROM jogador WHERE id_jogador = :id";
+        $sql = "DELETE FROM jogadora WHERE id_jogador = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
@@ -57,7 +57,7 @@ class JogadorController
     public function buscarPorId($id)
     {
         global $pdo;
-        $sql = "SELECT * FROM jogador WHERE id_jogador = :id";
+        $sql = "SELECT * FROM jogadora WHERE id_jogador = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id', $id);
         $stmt->execute();

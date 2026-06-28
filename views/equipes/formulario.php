@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../controllers/EquipeController.php';
+require_once __DIR__ . '/../../config/upload.php';
 
 $controller = new EquipeController();
 
@@ -16,24 +17,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $estado = $_POST['estado'];
     $cidade = $_POST['cidade'];
 
-    $fotoPath = $equipe['foto'] ?? null;
+    $pasta    = __DIR__ . '/../../fotos/';
+    $resultado = processarUploadImagem($_FILES['foto'], $pasta, $equipe['foto'] ?? null);
 
-    if (!empty($_FILES['foto']['name'])) {
-        $nomeArquivo = time() . '_' . $_FILES['foto']['name'];
-        $pasta = __DIR__ . '/../../fotos/';
-        if (!is_dir($pasta)) mkdir($pasta, 0777, true);
-        move_uploaded_file($_FILES['foto']['tmp_name'], $pasta . $nomeArquivo);
-        $fotoPath = "/MATCHPOINT/fotos/" . $nomeArquivo;
-    }
-
-    if ($id) {
-        $controller->atualizar($id, $nome, $estado, $cidade, $fotoPath);
+    if (!$resultado['sucesso']) {
+        $erroUpload = $resultado['erro'];
     } else {
-        $controller->inserir($nome, $estado, $cidade, $fotoPath);
-    }
+        $fotoPath = $resultado['caminho'];
 
-    header("Location: lista.php");
-    exit;
+        if ($id) {
+            $controller->atualizar($id, $nome, $estado, $cidade, $fotoPath);
+        } else {
+            $controller->inserir($nome, $estado, $cidade, $fotoPath);
+        }
+
+        header("Location: lista.php");
+        exit;
+    }
 }
 
 require_once __DIR__ . '/../includes/header.php';
@@ -60,8 +60,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <div class="col-6">
                     <label>Estado (UF)</label>
-                    <select name="estado" id="estado" class="form-select" required
-                            onchange="carregarCidades()">
+                   <select name="estado" id="estado" class="form-select" required>
                         <option value="">Selecione</option>
                         <?php
                         $ufs = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA',
@@ -107,6 +106,9 @@ require_once __DIR__ . '/../includes/header.php';
             <?php endif; ?>
 
             <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            <?php if (!empty($erroUpload)): ?>
+                <div class="alert alert-danger"><?= $erroUpload ?></div>
+            <?php endif; ?>
             <a href="lista.php" class="btn btn-secondary w-100 mt-2">Voltar</a>
 
         </form>
@@ -114,13 +116,14 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <script>
-async function carregarCidades() {
+async function carregarCidades(manterCidade = null) {
     const uf   = document.getElementById('estado').value;
     const sel  = document.getElementById('cidade');
     const spin = document.getElementById('spin');
 
     if (!uf) {
         sel.innerHTML = '<option value="">Selecione o estado primeiro</option>';
+        sel.disabled = true;
         return;
     }
 
@@ -139,6 +142,16 @@ async function carregarCidades() {
                 `<option value="${c.nome}">${c.nome}</option>`
             ).join('');
 
+        // Restaura a cidade salva se foi passada e o estado não mudou
+        if (manterCidade) {
+            for (let opt of sel.options) {
+                if (opt.value.toUpperCase() === manterCidade.toUpperCase()) {
+                    opt.selected = true;
+                    break;
+                }
+            }
+        }
+
         sel.disabled = false;
     } catch (e) {
         sel.innerHTML = '<option value="">Erro ao carregar cidades</option>';
@@ -147,21 +160,80 @@ async function carregarCidades() {
     spin.style.display = 'none';
 }
 
+// Ao carregar a página em modo edição: carrega cidades e mantém a cidade salva
 window.addEventListener('DOMContentLoaded', () => {
-    const estadoAtual  = "<?= $equipe['estado'] ?? '' ?>";
-    const cidadeAtual  = "<?= $equipe['cidade'] ?? '' ?>";
+    const estadoAtual = "<?= htmlspecialchars($equipe['estado'] ?? '') ?>";
+    const cidadeAtual = "<?= htmlspecialchars($equipe['cidade'] ?? '') ?>";
 
     if (estadoAtual) {
-        carregarCidades().then(() => {
-            const sel = document.getElementById('cidade');
+        // Passa a cidade para ser restaurada após carregar
+        carregarCidades(cidadeAtual);
+    }
+});
+
+// Ao trocar o estado manualmente: carrega cidades SEM manter cidade anterior
+document.getElementById('estado').addEventListener('change', () => {
+    carregarCidades(null);
+});
+</script><script>
+async function carregarCidades(manterCidade = null) {
+    const uf   = document.getElementById('estado').value;
+    const sel  = document.getElementById('cidade');
+    const spin = document.getElementById('spin');
+
+    if (!uf) {
+        sel.innerHTML = '<option value="">Selecione o estado primeiro</option>';
+        sel.disabled = true;
+        return;
+    }
+
+    spin.style.display = 'inline';
+    sel.disabled = true;
+    sel.innerHTML = '<option>Carregando cidades…</option>';
+
+    try {
+        const res = await fetch(
+            `https://brasilapi.com.br/api/ibge/municipios/v1/${uf}?providers=dados-abertos-br,gov,wikipedia`
+        );
+        const cidades = await res.json();
+
+        sel.innerHTML = '<option value="">Selecione a cidade</option>' +
+            cidades.map(c =>
+                `<option value="${c.nome}">${c.nome}</option>`
+            ).join('');
+
+        // Restaura a cidade salva se foi passada e o estado não mudou
+        if (manterCidade) {
             for (let opt of sel.options) {
-                if (opt.value === cidadeAtual) {
+                if (opt.value.toUpperCase() === manterCidade.toUpperCase()) {
                     opt.selected = true;
                     break;
                 }
             }
-        });
+        }
+
+        sel.disabled = false;
+    } catch (e) {
+        sel.innerHTML = '<option value="">Erro ao carregar cidades</option>';
     }
+
+    spin.style.display = 'none';
+}
+
+// Ao carregar a página em modo edição: carrega cidades e mantém a cidade salva
+window.addEventListener('DOMContentLoaded', () => {
+    const estadoAtual = "<?= htmlspecialchars($equipe['estado'] ?? '') ?>";
+    const cidadeAtual = "<?= htmlspecialchars($equipe['cidade'] ?? '') ?>";
+
+    if (estadoAtual) {
+        // Passa a cidade para ser restaurada após carregar
+        carregarCidades(cidadeAtual);
+    }
+});
+
+// Ao trocar o estado manualmente: carrega cidades SEM manter cidade anterior
+document.getElementById('estado').addEventListener('change', () => {
+    carregarCidades(null);
 });
 </script>
 
